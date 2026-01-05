@@ -11,38 +11,113 @@ import {
 import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
 import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { mockLogin } from "../../services/mockLogin";
+import { useAuthStore } from "../../stores/authStore";
 
 export const Route = createFileRoute("/_guest/Login")({
-  component: RouteComponent,
+  component: Login,
 });
-type FormFields = {
-  email: string;
-  password: string;
-};
 
-function RouteComponent() {
+const loginSchema = z.object({
+  email: z
+    .email("Please enter a valid email address")
+    .nonempty("Email is required"),
+  password: z
+    .string()
+    .nonempty("Password is required")
+    .min(8, "Password must be at least 8 characters"),
+});
+
+type FormFields = z.infer<typeof loginSchema>;
+
+function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const { setAuth } = useAuthStore();
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormFields>();
+  } = useForm<FormFields>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const onSubmit = (data: FormFields) => {
-    console.log("Form submitted:", data);
-    // TODO: Implement login logic
-  };
+  const { mutateAsync: onSubmit } = useMutation({
+    mutationFn: (variables: FormFields) => {
+      return mockLogin(variables);
+    },
+    onSuccess: (data) => {
+      setAuth(data.access, {
+        gender: "other",
+        name: {
+          title: "Mx",
+          first: "Quantum",
+          last: "User",
+        },
+        location: {
+          street: {
+            number: 123,
+            name: "Tech Street",
+          },
+          city: "San Francisco",
+          state: "CA",
+          country: "USA",
+          postcode: "94102",
+          coordinates: {
+            latitude: "37.7749",
+            longitude: "-122.4194",
+          },
+          timezone: {
+            offset: "-08:00",
+            description: "Pacific Time (US & Canada)",
+          },
+        },
+        email: "q@quantum.io",
+        login: {
+          uuid: "fake-uuid-1234",
+          username: "quantumuser",
+          password: "qTask123#",
+          salt: "abc123",
+          md5: "md5hash",
+          sha1: "sha1hash",
+          sha256: "sha256hash",
+        },
+        dob: {
+          date: "1990-01-01T00:00:00.000Z",
+          age: 34,
+        },
+        registered: {
+          date: "2020-01-01T00:00:00.000Z",
+          age: 4,
+        },
+        phone: "+1 (555) 123-4567",
+        cell: "+1 (555) 765-4321",
+        id: {
+          name: "SSN",
+          value: "123-45-6789",
+        },
+        picture: {
+          large: "https://randomuser.me/api/portraits/lego/1.jpg",
+          medium: "https://randomuser.me/api/portraits/med/lego/1.jpg",
+          thumbnail: "https://randomuser.me/api/portraits/thumb/lego/1.jpg",
+        },
+        nat: "US",
+      });
+    },
+    onError: (error) => {
+      setError("email", { message: error.message });
+    },
+  });
 
   return (
     <Paper
-      elevation={8}
       sx={{
-        p: 4,
         width: "100%",
         maxWidth: 420,
-        borderRadius: 3,
-        background: "linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)",
       }}
     >
       <Box sx={{ textAlign: "center", mb: 4 }}>
@@ -65,30 +140,28 @@ function RouteComponent() {
         </Typography>
       </Box>
 
-      {/* {error && (
-        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-          {error}
-        </Alert>
-      )} */}
-
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Box
+        component="form"
+        onSubmit={handleSubmit((data) => onSubmit(data))}
+        noValidate
+      >
         <TextField
           fullWidth
           label="Email"
           type="email"
-          {...register("email", {
-            required: "Email is required",
-          })}
+          {...register("email")}
           error={!!errors.email}
           helperText={errors.email?.message}
           disabled={isSubmitting}
           sx={{ mb: 2.5 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Email color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Email color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
           placeholder="q@quantum.io"
         />
@@ -97,31 +170,31 @@ function RouteComponent() {
           fullWidth
           label="Password"
           type={showPassword ? "text" : "password"}
-          {...register("password", {
-            required: "Password is required",
-          })}
+          {...register("password")}
           error={!!errors.password}
           helperText={errors.password?.message}
           disabled={isSubmitting}
           sx={{ mb: 3 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Lock color="action" />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                  disabled={isSubmitting}
-                  size="small"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Lock color="action" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    disabled={isSubmitting}
+                    size="small"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
           }}
         />
 
@@ -131,19 +204,6 @@ function RouteComponent() {
           variant="contained"
           size="large"
           disabled={isSubmitting}
-          sx={{
-            py: 1.5,
-            borderRadius: 2,
-            fontWeight: 600,
-            textTransform: "none",
-            fontSize: "1rem",
-            background: "linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)",
-            boxShadow: "0 4px 14px rgba(26, 35, 126, 0.4)",
-            "&:hover": {
-              background: "linear-gradient(135deg, #0d47a1 0%, #1565c0 100%)",
-              boxShadow: "0 6px 20px rgba(26, 35, 126, 0.5)",
-            },
-          }}
         >
           {isSubmitting ? (
             <CircularProgress size={24} color="inherit" />
