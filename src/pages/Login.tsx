@@ -9,18 +9,14 @@ import {
   Typography,
 } from "@mui/material";
 import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
-import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { mockLogin } from "../../services/mockLogin";
-import { useAuthStore } from "../../stores/authStore";
-
-export const Route = createFileRoute("/_guest/Login")({
-  component: Login,
-});
+import { mockLogin } from "../services/mockLogin";
+import { useAuthStore } from "../stores/authStore";
+import { useNavigate } from "@tanstack/react-router";
 
 const loginSchema = z.object({
   email: z
@@ -34,9 +30,10 @@ const loginSchema = z.object({
 
 type FormFields = z.infer<typeof loginSchema>;
 
-function Login() {
+export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { setAuth } = useAuthStore();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -107,6 +104,7 @@ function Login() {
         },
         nat: "US",
       });
+      navigate({ to: "/" });
     },
     onError: (error) => {
       setError("email", { message: error.message });
@@ -222,4 +220,5 @@ function Login() {
       </Box>
     </Paper>
   );
-}
+};
+
