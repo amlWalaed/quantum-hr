@@ -6,9 +6,9 @@ import {
 import { RootLayout } from "./layouts/RootLayout";
 import { GuestLayout } from "./layouts/GuestLayout";
 import { AuthLayout } from "./layouts/AuthLayout";
-import { Index } from "./pages/Index";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
+import { Profile } from "./pages/Profile";
 import { ProtectedRouteGuard } from "./guards/ProtectedRouteGuard";
 import { GuestRouteGuard } from "./guards/GuestRouteGuard";
 
@@ -41,6 +41,12 @@ const indexRoute = createRoute({
   component: Dashboard,
 });
 
+const profileRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: "/profile",
+  component: Profile,
+});
+
 const loginRoute = createRoute({
   getParentRoute: () => guestRoute,
   path: "/login",
@@ -49,7 +55,7 @@ const loginRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   guestRoute.addChildren([loginRoute]),
-  protectedRoute.addChildren([indexRoute]),
+  protectedRoute.addChildren([indexRoute, profileRoute]),
 ]);
 
 export const router = createRouter({ routeTree });

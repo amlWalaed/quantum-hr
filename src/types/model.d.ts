@@ -84,4 +84,14 @@ declare global {
     email: string;
     password: string;
   }
+
+  export interface ProfileUpdateData extends Pick<
+    User,
+    | "name"
+    | "phone"
+    | "jobTitle"
+    | "yearsOfExperience"
+    | "address"
+    | "workingHours"
+  > {}
 }

@@ -25,7 +25,7 @@ export const theme = createTheme({
     button: {
       textTransform: "none",
       fontWeight: 600,
-      fontSize: "1rem",
+      fontSize: "0.875rem",
     },
   },
   components: {
@@ -33,10 +33,26 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          padding: "12px 24px",
+          padding: "8px 16px",
           fontWeight: 600,
           textTransform: "none",
-          fontSize: "1rem",
+          fontSize: "0.875rem",
+          minHeight: "36px",
+        },
+        sizeSmall: {
+          padding: "6px 12px",
+          fontSize: "0.8125rem",
+          minHeight: "32px",
+        },
+        sizeMedium: {
+          padding: "8px 16px",
+          fontSize: "0.875rem",
+          minHeight: "36px",
+        },
+        sizeLarge: {
+          padding: "10px 20px",
+          fontSize: "0.9375rem",
+          minHeight: "40px",
         },
         contained: {
           background: "linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)",
@@ -46,15 +62,11 @@ export const theme = createTheme({
             boxShadow: "0 6px 20px rgba(26, 35, 126, 0.5)",
           },
         },
-        sizeLarge: {
-          paddingTop: "12px",
-          paddingBottom: "12px",
-        },
       },
     },
     MuiPaper: {
       defaultProps: {
-        elevation: 8,
+        elevation: 1,
       },
       styleOverrides: {
         root: {
@@ -71,6 +83,63 @@ export const theme = createTheme({
           fontSize: "0.9rem",
           fontWeight: 600,
         }),
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiInputBase-root": {
+            fontSize: "1rem",
+          },
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          fontSize: "0.875rem",
+        },
+        input: {
+          padding: "8px 12px",
+          fontSize: "0.875rem",
+        },
+        inputSizeSmall: {
+          padding: "6px 10px",
+          fontSize: "0.8125rem",
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        // root: {
+        //   fontSize: "0.875rem",
+        // },
+        input: {
+          padding: "8px 12px",
+          fontSize: "0.875rem",
+        },
+        inputSizeSmall: {
+          padding: "6px 10px",
+          fontSize: "0.8125rem",
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontSize: "0.875rem",
+        },
+        sizeSmall: {
+          fontSize: "0.8125rem",
+        },
+      },
+    },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          fontSize: "0.75rem",
+          marginTop: "4px",
+        },
       },
     },
   },

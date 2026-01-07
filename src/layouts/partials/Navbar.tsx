@@ -3,7 +3,6 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Button,
   Box,
   IconButton,
   Menu,
@@ -15,9 +14,9 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListItemButton,
 } from "@mui/material";
 import {
   Dashboard,
@@ -26,19 +25,19 @@ import {
   Menu as MenuIcon,
   Close,
 } from "@mui/icons-material";
-import { useNavigate, useLocation, Link } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { useAuthStore } from "../../stores/authStore";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { logout, user } = useAuthStore();
+  const { logout, user, profileFields } = useAuthStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  // TODO: Replace with actual profile data from your store
-  const profile = { name: "Quantum User", jobTitle: "User" };
-  // const { profile } = useAppSelector((state) => state.profile);
+  const profile = {
+    name: user ? `${user.name.first} ${user.name.last}` : "Quantum User",
+    jobTitle: profileFields.jobTitle || "User",
+  };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -64,8 +63,6 @@ const Navbar = () => {
     setMobileOpen(false);
   };
 
-  const isActive = (path: string) => location.pathname === path;
-
   const navItems = [
     { label: "Dashboard", path: "/", icon: <Dashboard /> },
     { label: "Profile", path: "/profile", icon: <Person /> },
@@ -90,17 +87,50 @@ const Navbar = () => {
       <List>
         {navItems.map((item) => (
           <ListItem key={item.path} disablePadding>
-            <ListItemButton
-              onClick={() => handleNavigation(item.path)}
-              selected={isActive(item.path)}
+            <Link
+              to={item.path}
+              activeOptions={{ exact: item.path === "/" }}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                width: "100%",
+              }}
             >
-              <ListItemIcon
-                sx={{ color: isActive(item.path) ? "primary.main" : "inherit" }}
-              >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItemButton>
+              {({ isActive }) => (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                    px: 2,
+                    py: 1.5,
+                    cursor: "pointer",
+                    backgroundColor: isActive
+                      ? "action.selected"
+                      : "transparent",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={() => {
+                    handleNavigation(item.path);
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 40,
+                      color: isActive ? "primary.main" : "inherit",
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
+                  <Typography sx={{ ml: 2 }}>{item.label}</Typography>
+                </Box>
+              )}
+            </Link>
           </ListItem>
         ))}
       </List>
@@ -153,23 +183,66 @@ const Navbar = () => {
               }}
               onClick={() => navigate({ to: "/" })}
             >
-              QuantumHR
+              Quantum HR
             </Typography>
           </Box>
 
           {!isMobile && (
             <Box sx={{ display: "flex", gap: 1 }}>
               {navItems.map((item) => (
-                <Button
-                  LinkComponent={Link}
+                <Link
                   key={item.path}
-                  startIcon={item.icon}
-                  size="small"
-                  onClick={() => handleNavigation(item.path)}
-                  variant="text"
+                  to={item.path}
+                  activeOptions={{ exact: item.path === "/" }}
+                  style={{ textDecoration: "none" }}
                 >
-                  {item.label}
-                </Button>
+                  {({ isActive }) => (
+                    <Box
+                      component="span"
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        px: 2,
+                        py: 1,
+                        color: isActive ? "primary.main" : "text.primary",
+                        fontWeight: isActive ? 600 : 400,
+                        fontSize: "0.875rem",
+                        borderRadius: 1,
+                        position: "relative",
+                        cursor: "pointer",
+                        "&::after": {
+                          content: '""',
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: 2,
+                          backgroundColor: isActive
+                            ? "primary.main"
+                            : "transparent",
+                          borderRadius: "2px 2px 0 0",
+                        },
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                          color: isActive ? "primary.main" : "text.primary",
+                        },
+                      }}
+                    >
+                      <Box
+                        component="span"
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          fontSize: "1.125rem",
+                        }}
+                      >
+                        {item.icon}
+                      </Box>
+                      {item.label}
+                    </Box>
+                  )}
+                </Link>
               ))}
             </Box>
           )}
