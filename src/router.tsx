@@ -2,34 +2,43 @@ import {
   createRouter,
   createRootRoute,
   createRoute,
-  redirect,
 } from "@tanstack/react-router";
 import { RootLayout } from "./layouts/RootLayout";
 import { GuestLayout } from "./layouts/GuestLayout";
+import { AuthLayout } from "./layouts/AuthLayout";
 import { Index } from "./pages/Index";
 import { Login } from "./pages/Login";
-import { useAuthStore } from "./stores/authStore";
+import { Dashboard } from "./pages/Dashboard";
+import { ProtectedRouteGuard } from "./guards/ProtectedRouteGuard";
+import { GuestRouteGuard } from "./guards/GuestRouteGuard";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
 
-const indexRoute = createRoute({
+const protectedRoute = createRoute({
+  id: "_protected",
   getParentRoute: () => rootRoute,
-  path: "/",
-  component: Index,
+  component: AuthLayout,
+  beforeLoad: () => {
+    ProtectedRouteGuard();
+  },
 });
 
 const guestRoute = createRoute({
-  getParentRoute: () => rootRoute,
   id: "_guest",
+  getParentRoute: () => rootRoute,
   component: GuestLayout,
-  beforeLoad: ({}) => {
-    const { isAuthenticated } = useAuthStore.getState();
-    if (isAuthenticated) {
-      redirect({ to: "/" });
-    }
+  beforeLoad: () => {
+    GuestRouteGuard();
   },
+});
+
+// Routes
+const indexRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: "/",
+  component: Dashboard,
 });
 
 const loginRoute = createRoute({
@@ -39,8 +48,8 @@ const loginRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  indexRoute,
   guestRoute.addChildren([loginRoute]),
+  protectedRoute.addChildren([indexRoute]),
 ]);
 
 export const router = createRouter({ routeTree });

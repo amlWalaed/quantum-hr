@@ -116,6 +116,7 @@ export const Login = () => {
       sx={{
         width: "100%",
         maxWidth: 420,
+        padding: 4,
       }}
     >
       <Box sx={{ textAlign: "center", mb: 4 }}>
@@ -221,4 +222,3 @@ export const Login = () => {
     </Paper>
   );
 };
-

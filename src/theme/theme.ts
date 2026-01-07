@@ -59,8 +59,18 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          padding: 32,
         },
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          width: 36,
+          height: 36,
+          backgroundColor: theme.palette.primary.main,
+          fontSize: "0.9rem",
+          fontWeight: 600,
+        }),
       },
     },
   },
